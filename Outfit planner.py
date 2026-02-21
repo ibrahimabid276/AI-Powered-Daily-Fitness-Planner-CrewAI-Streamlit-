@@ -6,7 +6,7 @@ load_dotenv ()
  # Tools
 llm = LLM(
     model="gemini/gemini-2.5-flash",
-    api_key=os.getenv("AIzaSyDn1YVsKRi0KX8gtpRAB81ogTOIbhPvLc4")
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
 # -----------------------INTRO -------------------------
