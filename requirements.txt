@@ -1,5 +1,6 @@
-crewai[google-genai]
+crewai
 crewai-tools
+google-generativeai
 python-dotenv
 streamlit
 sentence-transformers
