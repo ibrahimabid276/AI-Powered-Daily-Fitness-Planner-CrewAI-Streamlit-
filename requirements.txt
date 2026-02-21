@@ -1,6 +1,5 @@
-crewai
-crewai-tools
-google-generativeai
+crewai[tools]
+google-generativeai>=0.8.0
 python-dotenv
 streamlit
 sentence-transformers

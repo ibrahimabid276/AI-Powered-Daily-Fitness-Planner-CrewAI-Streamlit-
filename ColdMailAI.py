@@ -7,22 +7,31 @@ import streamlit as st
 load_dotenv()
 
 st.set_page_config(
-    page_title="Cold Email Generator",
+    page_title="Cold Email Generator 🎌",
     page_icon="📧",
     layout="wide"
 )
 
-st.title("Cold Email AI")
+st.title("Cold Email AI🤖")
 
-agency_services = """
-1. AI Automation: Best for companies with manual, repetitive tasks. We build agents to save time.
-2. AI Agents: Best for companies needing smart assistants for support, sales, and daily tasks.
-3. AI Problem Solving: Best for companies facing workflow inefficiencies. We provide practical AI solutions.
-"""
+# User inputs for customization
+st.sidebar.header("Your Information")
+your_name = st.sidebar.text_input("Your Name", "Your Name")
+your_company = st.sidebar.text_input("Your Company", "Your Company")
+your_service = st.sidebar.text_area("Your Service/Offering", "Describe what service or product you offer...")
 
-target_url = st.text_input("Enter Target Company Website URL", "https://openai.com/")
+st.header("Target Company Information")
+target_url = st.text_input("Enter Target Company Website URL", placeholder="https://example.com")
+target_company_name = st.text_input("Target Company Name (optional)", placeholder="Leave blank to auto-detect")
 
-if st.button("Generate Cold Email"):
+if st.button("Generate Cold Email 🤖"):
+    if not target_url:
+        st.error("Please enter a target company URL")
+        st.stop()
+    
+    if not your_service or your_service == "Describe what service or product you offer...":
+        st.error("Please describe your service in the sidebar")
+        st.stop()
 
     llm = LLM(
         model="gemini/gemini-2.5-flash",
@@ -43,15 +52,15 @@ if st.button("Generate Cold Email"):
     )
 
     strategist = Agent(
-        role='Agency Strategist',
-        goal='Match the target company needs with ONE of our agency services.',
-        backstory=f"""You work for a top-tier digital agency.
-Your goal is to read the analysis of a prospect and decide which of OUR services to pitch.
+        role='Service Strategist',
+        goal='Match the target company needs with the service being offered.',
+        backstory=f"""You are an expert at identifying business needs and matching them with solutions.
+Your goal is to read the analysis of a prospect and determine how the following service can help them:
 
-OUR SERVICES KNOWLEDGE BASE:
-{agency_services}
+SERVICE BEING OFFERED:
+{your_service}
 
-You must pick the SINGLE best service for this specific client and explain why.""",
+You must explain why this service is a good fit for the target company based on their website analysis.""",
         verbose=True,
         memory=True,
         llm=llm
@@ -79,7 +88,14 @@ You mention specific details found by the Researcher to prove we actually looked
     )
 
     task_write = Task(
-        description="Draft a cold email to the CEO of the target company. Pitch the selected service. Keep it under 150 words.",
+        description=f"""Draft a personalized cold email from {your_name} at {your_company} to the target company.
+        
+Key requirements:
+- Mention specific details found from their website to prove you researched them
+- Explain how {your_service} can help solve their specific pain points
+- Keep it under 150 words
+- Make it sound human and professional, not robotic
+- Include a clear call-to-action""",
         expected_output="A professional cold email ready to send.",
         agent=writer
     )
