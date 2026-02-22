@@ -1,5 +1,6 @@
 crewai
 crewai-tools
-google-generativeai
+google-generativeai>=0.8.0
+litellm
 python-dotenv
 streamlit
