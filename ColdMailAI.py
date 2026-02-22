@@ -24,6 +24,11 @@ st.header("Target Company Information")
 target_url = st.text_input("Enter Target Company Website URL", placeholder="https://example.com")
 target_company_name = st.text_input("Target Company Name (optional)", placeholder="Leave blank to auto-detect")
 
+
+def get_gemini_api_key() -> str | None:
+    # Streamlit Cloud commonly stores secrets in st.secrets instead of .env files.
+    return os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
+
 if st.button("Generate Cold Email 🤖"):
     if not target_url:
         st.error("Please enter a target company URL")
@@ -33,9 +38,17 @@ if st.button("Generate Cold Email 🤖"):
         st.error("Please describe your service in the sidebar")
         st.stop()
 
+    gemini_api_key = get_gemini_api_key()
+    if not gemini_api_key:
+        st.error(
+            "Missing GEMINI_API_KEY. Add it to Streamlit Secrets or environment variables."
+        )
+        st.stop()
+
     llm = LLM(
         model="gemini/gemini-2.5-flash",
-        api_key=os.getenv("GEMINI_API_KEY")
+        api_key=gemini_api_key,
+        use_native=False
     )
 
     scrape_tool = ScrapeWebsiteTool()

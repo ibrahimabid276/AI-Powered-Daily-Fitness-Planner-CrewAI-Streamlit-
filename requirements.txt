@@ -1,8 +1,5 @@
 crewai
 crewai-tools
-google-generativeai>=0.8.0
+google-generativeai
 python-dotenv
 streamlit
-sentence-transformers
-pygame
-pgzero
