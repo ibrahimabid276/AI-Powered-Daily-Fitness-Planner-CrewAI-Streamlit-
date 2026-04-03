@@ -1,4 +1,7 @@
 import os
+# Disable CrewAI telemetry to avoid signal handler errors in Streamlit
+os.environ["CREWAI_DISABLE_TELEMETRY"] = "true"
+
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import ScrapeWebsiteTool
 from dotenv import load_dotenv
@@ -16,39 +19,34 @@ st.title("Cold Email AI🤖")
 
 # User inputs for customization
 st.sidebar.header("Your Information")
-your_name = st.sidebar.text_input("Your Name", "Your Name")
-your_company = st.sidebar.text_input("Your Company", "Your Company")
-your_service = st.sidebar.text_area("Your Service/Offering", "Describe what service or product you offer...")
+your_name = st.sidebar.text_input("Your Name", placeholder="Enter your name")
+your_company = st.sidebar.text_input("Your Company", placeholder="Enter your company name")
+your_service = st.sidebar.text_area("Your Service/Offering", placeholder="Describe what service or product you offer...")
 
 st.header("Target Company Information")
 target_url = st.text_input("Enter Target Company Website URL", placeholder="https://example.com")
 target_company_name = st.text_input("Target Company Name (optional)", placeholder="Leave blank to auto-detect")
 
-
-def get_gemini_api_key() -> str | None:
-    # Streamlit Cloud commonly stores secrets in st.secrets instead of .env files.
-    return os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
-
 if st.button("Generate Cold Email 🤖"):
-    if not target_url:
-        st.error("Please enter a target company URL")
+    if not your_name:
+        st.error("Please enter your name in the sidebar")
         st.stop()
-    
-    if not your_service or your_service == "Describe what service or product you offer...":
+
+    if not your_company:
+        st.error("Please enter your company name in the sidebar")
+        st.stop()
+
+    if not your_service:
         st.error("Please describe your service in the sidebar")
         st.stop()
 
-    gemini_api_key = get_gemini_api_key()
-    if not gemini_api_key:
-        st.error(
-            "Missing GEMINI_API_KEY. Add it to Streamlit Secrets or environment variables."
-        )
+    if not target_url:
+        st.error("Please enter a target company URL")
         st.stop()
 
     llm = LLM(
         model="gemini/gemini-2.5-flash",
-        api_key=gemini_api_key,
-        use_native=False
+        api_key=os.getenv("GEMINI_API_KEY")
     )
 
     scrape_tool = ScrapeWebsiteTool()
